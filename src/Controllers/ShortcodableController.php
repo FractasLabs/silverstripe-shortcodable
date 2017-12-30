@@ -1,4 +1,24 @@
 <?php
+
+namespace SheaDawson\Shortcodable\Controllers;
+
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPRequest;
+use SheaDawson\Shortcodable\Extensions\ShortcodableParser;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\View\SSViewer;
+use SheaDawson\Shortcodable\Shortcodable;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\CompositeField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\Form;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Security\Permission;
+use SilverStripe\Admin\LeftAndMain;
+
 /**
  * ShortcodableController.
  *
@@ -16,14 +36,14 @@ class ShortcodableController extends LeftAndMain
     private static $allowed_actions = array(
         'ShortcodeForm' => 'CMS_ACCESS_CMSMain',
         'handleEdit' => 'CMS_ACCESS_CMSMain',
-        'shortcodePlaceHolder' => 'CMS_ACCESS_CMSMain'
+        'shortcodePlaceHolder' => 'CMS_ACCESS_CMSMain',
     );
 
     /**
      * @var array
      */
     private static $url_handlers = array(
-        'edit/$ShortcodeType!/$Action//$ID/$OtherID' => 'handleEdit'
+        'edit/$ShortcodeType!/$Action//$ID/$OtherID' => 'handleEdit',
     );
 
     /**
@@ -32,7 +52,7 @@ class ShortcodableController extends LeftAndMain
     protected $shortcodableclass;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $isnew = true;
 
@@ -76,16 +96,18 @@ class ShortcodableController extends LeftAndMain
     }
 
     /**
-     * handleEdit
+     * handleEdit.
      */
-    public function handleEdit(SS_HTTPRequest $request)
+    public function handleEdit(HTTPRequest $request)
     {
         $this->shortcodableclass = $request->param('ShortcodeType');
+
         return $this->handleAction($request, $action = $request->param('Action'));
     }
 
     /**
      * Get the shortcode data from the request.
+     *
      * @return array shortcodedata
      */
     protected function getShortcodeData()
@@ -97,9 +119,10 @@ class ShortcodableController extends LeftAndMain
         if ($shortcode = $this->request->requestVar('Shortcode')) {
             //remove BOM inside string on cursor position...
             $shortcode = str_replace("\xEF\xBB\xBF", '', $shortcode);
-            $data = singleton('ShortcodableParser')->the_shortcodes(array(), $shortcode);
+            $data = singleton(ShortcodableParser::class)->the_shortcodes(array(), $shortcode);
             if (isset($data[0])) {
                 $this->shortcodedata = $data[0];
+
                 return $this->shortcodedata;
             }
         }
@@ -112,7 +135,7 @@ class ShortcodableController extends LeftAndMain
      **/
     public function ShortcodeForm()
     {
-        Config::inst()->update('SSViewer', 'theme_enabled', false);
+        Config::inst()->update(SSViewer::class, 'theme_enabled', false);
         $classes = Shortcodable::get_shortcodable_classes_fordropdown();
         $classname = $this->shortcodableclass;
 
@@ -136,13 +159,13 @@ class ShortcodableController extends LeftAndMain
             LiteralField::create('shortcodablefields', '<div class="ss-shortcodable content">'),
             DropdownField::create('ShortcodeType', _t('Shortcodable.SHORTCODETYPE', 'Shortcode type'), $classes, $classname)
                 ->setHasEmptyDefault(true)
-                ->addExtraClass('shortcode-type')
+                ->addExtraClass('shortcode-type'),
         ));
 
         // attribute and object id fields
         if ($classname && class_exists($classname)) {
             $class = singleton($classname);
-            if (is_subclass_of($class, 'DataObject')) {
+            if (is_subclass_of($class, DataObject::class)) {
                 if (singleton($classname)->hasMethod('getShortcodableRecords')) {
                     $dataObjectSource = singleton($classname)->getShortcodableRecords();
                 } else {
@@ -169,7 +192,7 @@ class ShortcodableController extends LeftAndMain
             FormAction::create('insert', _t('Shortcodable.BUTTONINSERTSHORTCODE', 'Insert shortcode'))
                 ->addExtraClass('ss-ui-action-constructive')
                 ->setAttribute('data-icon', 'accept')
-                ->setUseButtonTag(true)
+                ->setUseButtonTag(true),
         ));
 
         // form
@@ -186,7 +209,7 @@ class ShortcodableController extends LeftAndMain
 
             // special treatment for setting value of UploadFields
             foreach ($form->Fields()->dataFields() as $field) {
-                if (is_a($field, 'UploadField') && isset($data['atts'][$field->getName()])) {
+                if (is_a($field, UploadField::class) && isset($data['atts'][$field->getName()])) {
                     $field->setValue(array('Files' => explode(',', $data['atts'][$field->getName()])));
                 }
             }
@@ -197,8 +220,6 @@ class ShortcodableController extends LeftAndMain
 
     /**
      * Generates shortcode placeholder to display inside TinyMCE instead of the shortcode.
-     *
-     * @return void
      */
     public function shortcodePlaceHolder($request)
     {
@@ -223,13 +244,14 @@ class ShortcodableController extends LeftAndMain
             $attributes = null;
             if ($shortcode = $request->requestVar('Shortcode')) {
                 $shortcode = str_replace("\xEF\xBB\xBF", '', $shortcode); //remove BOM inside string on cursor position...
-                $shortcodeData = singleton('ShortcodableParser')->the_shortcodes(array(), $shortcode);
+                $shortcodeData = singleton(ShortcodableParser::class)->the_shortcodes(array(), $shortcode);
                 if (isset($shortcodeData[0])) {
                     $attributes = $shortcodeData[0]['atts'];
                 }
             }
 
             $link = $object->getShortcodePlaceholder($attributes);
+
             return $this->redirect($link);
         }
     }

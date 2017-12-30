@@ -1,12 +1,19 @@
 <?php
+
+namespace SheaDawson\Shortcodable\Extensions;
+
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * ShortcodableParser - temporary measure, based on wordpress parser
  * This parser is only used to parse tags in the html editor field for editing in the popup window.
  *
  * @todo update SS ShortcodeParser to offer a public api for converting a shortcode to a data array, and use that instead.
  */
-class ShortcodableParser extends Object
+class ShortcodableParser
 {
+    use Injectable;
+
     /**
      * @var array
      */
@@ -22,6 +29,7 @@ class ShortcodableParser extends Object
 
     /**
      * @param string $text
+     *
      * @return array
      */
     public function get_pattern($text)
@@ -34,6 +42,7 @@ class ShortcodableParser extends Object
 
     /**
      * @param string $content
+     *
      * @return array
      */
     public function parse_atts($content)
@@ -42,23 +51,24 @@ class ShortcodableParser extends Object
         list($dummy, $keys, $values) = array_values($c);
         $c = array();
         foreach ($keys as $key => $value) {
-            $value = trim($values[ $key ], "\"'");
+            $value = trim($values[$key], "\"'");
             $type = is_numeric($value) ? 'int' : 'string';
             $type = in_array(strtolower($value), array('true', 'false')) ? 'bool' : $type;
             switch ($type) {
                 case 'int': $value = (int) $value; break;
-                case 'bool': $value = strtolower($value) == 'true'; break;
+                case 'bool': $value = 'true' == strtolower($value); break;
             }
-            $c[ $keys[ $key ] ] = $value;
+            $c[$keys[$key]] = $value;
         }
 
         return $c;
     }
 
     /**
-     * @param array $output
+     * @param array  $output
      * @param string $text
-     * @param boolean $child
+     * @param bool   $child
+     *
      * @return array
      */
     public function the_shortcodes($output, $text, $child = false)
@@ -72,12 +82,12 @@ class ShortcodableParser extends Object
             foreach ($parents as $k => $parent) {
                 ++$n;
                 $name = $child ? 'child'.$n : $n;
-                $t = array_filter($this->get_pattern($contents[ $k ]));
-                $t_s = $this->the_shortcodes($out2, $contents[ $k ], true);
-                $output[ $name ] = array('name' => $parents[ $k ]);
-                $output[ $name ]['atts'] = $this->parse_atts($atts[ $k ]);
-                $output[ $name ]['original_content'] = $contents[ $k ];
-                $output[ $name ]['content'] = !empty($t) && !empty($t_s) ? $t_s : $contents[ $k ];
+                $t = array_filter($this->get_pattern($contents[$k]));
+                $t_s = $this->the_shortcodes($out2, $contents[$k], true);
+                $output[$name] = array('name' => $parents[$k]);
+                $output[$name]['atts'] = $this->parse_atts($atts[$k]);
+                $output[$name]['original_content'] = $contents[$k];
+                $output[$name]['content'] = !empty($t) && !empty($t_s) ? $t_s : $contents[$k];
             }
         }
 

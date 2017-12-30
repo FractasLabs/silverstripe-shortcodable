@@ -1,8 +1,8 @@
-(function () {
+(function() {
     if (typeof tinymce !== 'undefined') {
 
         tinymce.create('tinymce.plugins.shortcodable', {
-            getInfo: function () {
+            getInfo: function() {
                 return {
                     longname: 'Shortcodable - Shortcode UI plugin for SilverStripe',
                     author: 'Shea Dawson',
@@ -12,7 +12,7 @@
                 };
             },
 
-            init: function (ed, url) {
+            init: function(ed, url) {
                 var me = tinyMCE.activeEditor.plugins.shortcodable;
 
                 ed.addButton('shortcodable', {
@@ -21,31 +21,32 @@
                     'class': 'mce_shortcode'
                 });
 
-                ed.addCommand('shortcodable', function (ed) {
+                ed.addCommand('shortcodable', function(ed) {
+                    console.log(jQuery('#' + this.id));
                     jQuery('#' + this.id).entwine('ss').openShortcodeDialog();
                 });
 
-                // On load replace shorcode with placeholder.
-                ed.onLoadContent.add(function (ed, o) {
-                    var newContent = me.replaceShortcodesWithPlaceholders(o.content, ed);
-                    ed.execCommand('mceSetContent', false, newContent, false);
-                });
+                // // On load replace shorcode with placeholder.
+                // ed.onPostProcess.add(function (ed, o) {
+                //     var newContent = me.replaceShortcodesWithPlaceholders(o.content, ed);
+                //     ed.execCommand('mceSetContent', false, newContent, false);
+                // });
 
-                ed.onDblClick.add(function (ed, e) {
-                    var dom = ed.dom, node = e.target;
-                    if (node.nodeName === 'IMG' && dom.hasClass(node, 'shortcode-placeholder') && e.button !== 2) {
-                        ed.execCommand('shortcodable');
-                    }
-                });
+                // ed.onDblClick.add(function (ed, e) {
+                //     var dom = ed.dom, node = e.target;
+                //     if (node.nodeName === 'IMG' && dom.hasClass(node, 'shortcode-placeholder') && e.button !== 2) {
+                //         ed.execCommand('shortcodable');
+                //     }
+                // });
             },
 
             // replace shortcode strings with placeholder images
-            replaceShortcodesWithPlaceholders: function (content, editor) {
+            replaceShortcodesWithPlaceholders: function(content, editor) {
                 var plugin = tinyMCE.activeEditor.plugins.shortcodable;
                 var placeholderClasses = jQuery('#' + editor.id).entwine('ss').getPlaceholderClasses();
 
                 if (placeholderClasses) {
-                    return content.replace(/\[([a-z]+)\s*([^\]]*)\]/gi, function (found, name, params) {
+                    return content.replace(/\[([a-z]+)\s*([^\]]*)\]/gi, function(found, name, params) {
                         var id = plugin.getAttribute(params, 'id');
                         if (placeholderClasses.indexOf(name) != -1) {
                             var src = encodeURI('admin/shortcodes/shortcodePlaceHolder/' + name + '/' + id + '?Shortcode=[' + name + ' ' + params + ']');
@@ -64,15 +65,15 @@
             },
 
             // replace placeholder tags with shortcodes
-            replacePlaceholdersWithShortcodes: function (co) {
+            replacePlaceholdersWithShortcodes: function(co) {
                 var content = jQuery(co);
-                content.find('.shortcode-placeholder').each(function () {
+                content.find('.shortcode-placeholder').each(function() {
                     var el = jQuery(this);
                     var shortCode = '[' + tinymce.trim(el.attr('title')) + ']';
                     el.replaceWith(shortCode);
                 });
                 var originalContent = '';
-                content.each(function () {
+                content.each(function() {
                     if (this.outerHTML !== undefined) {
                         originalContent += this.outerHTML;
                     }
@@ -81,7 +82,7 @@
             },
 
             // get an attribute from a shortcode string by it's key
-            getAttribute: function (string, key) {
+            getAttribute: function(string, key) {
                 var attr = new RegExp(key + '=\"([^\"]+)\"', 'g').exec(string);
                 return attr ? tinymce.DOM.decode(attr[1]) : '';
             }

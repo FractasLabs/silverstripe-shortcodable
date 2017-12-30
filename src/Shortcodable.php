@@ -1,12 +1,22 @@
 <?php
+
+namespace SheaDawson\Shortcodable;
+
+use SilverStripe\View\Parsers\ShortcodeParser;
+use SheaDawson\Shortcodable\Extensions\ShortcodableParser;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injectable;
+
 /**
  * Shortcodable
- * Manages shortcodable configuration and register shortcodable objects
+ * Manages shortcodable configuration and register shortcodable objects.
  *
  * @author shea@livesource.co.nz
  **/
-class Shortcodable extends Object
+class Shortcodable
 {
+    use Injectable;
+
     private static $shortcodable_classes = array();
 
     public static function register_classes($classes)
@@ -25,13 +35,13 @@ class Shortcodable extends Object
                 user_error("Failed to register \"$class\" with shortcodable. $class must have the method parse_shortcode(). See /shortcodable/README.md", E_USER_ERROR);
             }
             ShortcodeParser::get('default')->register($class, array(singleton($class), 'parse_shortcode'));
-            singleton('ShortcodableParser')->register($class);
+            singleton(ShortcodableParser::class)->register($class);
         }
     }
 
     public static function get_shortcodable_classes()
     {
-        return Config::inst()->get('Shortcodable', 'shortcodable_classes');
+        return Config::inst()->get(self::class, 'shortcodable_classes');
     }
 
     public static function get_shortcodable_classes_fordropdown()
@@ -45,6 +55,7 @@ class Shortcodable extends Object
                 $classes[$class] = $class;
             }
         }
+
         return $classes;
     }
 
@@ -56,6 +67,7 @@ class Shortcodable extends Object
                 $classes[] = $class;
             }
         }
+
         return $classes;
     }
 }

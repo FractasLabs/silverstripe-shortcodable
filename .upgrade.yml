@@ -1,0 +1,5 @@
+mappings:
+  ShortcodableController: SheaDawson\Shortcodable\Controllers\ShortcodableController
+  ShortcodableHtmlEditorField: SheaDawson\Shortcodable\Extensions\ShortcodableHtmlEditorField
+  ShortcodableParser: SheaDawson\Shortcodable\Extensions\ShortcodableParser
+  Shortcodable: SheaDawson\Shortcodable\Shortcodable
