@@ -7,16 +7,24 @@
         "shortcode"
     ],
     "license": "BSD License",
-    "authors": [
-        {
-            "name": "Shea Dawson",
-            "email": "shea@livesource.co.nz"
-        }
-    ],
+    "authors": [{
+        "name": "Shea Dawson",
+        "email": "shea@livesource.co.nz"
+    }, {
+        "name": "Milan Jelicanin",
+        "email": "milan.jelicanin@fractas.com",
+        "homepage": "https://www.fractas.com/"
+    }],
     "require": {
         "composer/installers": "*",
         "silverstripe/cms": "~4.0",
-        "silverstripe/framework": "~4.0"
+        "silverstripe/framework": "~4.0",
+        "silverstripe/vendor-plugin": "^1.0"
+    },
+    "extra": {
+        "expose": [
+            "javascript"
+        ]
     },
     "support": {
         "issues": "https://github.com/sheadawson/silverstripe-shortcodable/issues"
