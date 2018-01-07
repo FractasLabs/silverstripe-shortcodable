@@ -3,7 +3,7 @@
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 use SilverStripe\Forms\HTMLEditor\HtmlEditorConfig;
-use SheaDawson\Shortcodable\Shortcodable;
+use Silverstripe\Shortcodable;
 
 if (!defined('SHORTCODABLE_DIR')) {
     define('SHORTCODABLE_DIR', rtrim(basename(dirname(__FILE__))));
@@ -11,7 +11,7 @@ if (!defined('SHORTCODABLE_DIR')) {
 
 // enable shortcodable buttons and add to HtmlEditorConfig
 $htmlEditorNames = Config::inst()->get(Shortcodable::class, 'htmleditor_names');
-$jsFile = ModuleResourceLoader::singleton()->resolveURL('sheadawson/shortcodable:javascript/editor_plugin.js');
+$jsFile = ModuleResourceLoader::singleton()->resolveURL('silverstripe/shortcodable:javascript/editor_plugin.js');
 if (is_array($htmlEditorNames)) {
     foreach ($htmlEditorNames as $htmlEditorName) {
         HtmlEditorConfig::get($htmlEditorName)->enablePlugins(array(

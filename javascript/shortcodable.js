@@ -10,8 +10,8 @@
 
         // add shortcode controller url to cms-editor-dialogs
         $('#cms-editor-dialogs').entwine({
-            onmatch: function() {
-                this.attr('data-url-shortcodeform', 'admin/shortcodes/ShortcodeForm/forTemplate');
+            onmatch: function(){
+                this.attr('data-url-shortcodeform', 'admin/shortcodable/ShortcodeForm/forTemplate');
             }
         });
 
@@ -26,16 +26,24 @@
                     return classes.split(',');
                 }
             },
-            
+
             /**
              * Make sure the editor has flushed all it's buffers before the form is submitted.
              */
             'from .cms-edit-form': {
                 onbeforesubmitform: function(e) {
+                     // Save the updated content here, rather than _after_ replacing the placeholders
+                    // otherwise you're replacing the shortcode html with the shortcode, then writing
+                    // the html back to the textarea value, overriding what the shortcode conversion
+                    // process has done
+                    this._super(e);
+
                     var shortcodable = tinyMCE.activeEditor.plugins.shortcodable;
-                    var ed = this.getEditor();
-                    var newContent = shortcodable.replacePlaceholdersWithShortcodes(ed.getContent(), ed);
-                    $(this).val(newContent);
+                    if (shortcodable) {
+                        var ed = this.getEditor();
+                        var newContent = shortcodable.replacePlaceholdersWithShortcodes($(this).val(), ed);
+                        $(this).val(newContent);
+                    }
                 }
             },
         });
@@ -77,7 +85,7 @@
                         var shortcodable = tinyMCE.activeEditor.plugins.shortcodable;
                         ed.replaceContent(shortcode);
                         var newContent = shortcodable.replaceShortcodesWithPlaceholders(ed.getContent(), ed.getInstance());
-                        console.log(newContent);
+                        // console.log(newContent);
                         ed.setContent(newContent);
                     });
                 }

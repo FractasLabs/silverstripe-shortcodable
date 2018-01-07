@@ -1,6 +1,6 @@
 <?php
 
-namespace SheaDawson\Shortcodable\Extensions;
+namespace Silverstripe\Shortcodable;
 
 use SilverStripe\Core\Injector\Injectable;
 
@@ -17,7 +17,7 @@ class ShortcodableParser
     /**
      * @var array
      */
-    protected $shortcodes = array();
+    protected $shortcodes = [];
 
     /**
      * @param string $name
@@ -35,7 +35,7 @@ class ShortcodableParser
     public function get_pattern($text)
     {
         $pattern = $this->get_shortcode_regex();
-        preg_match_all("/$pattern/s", $text, $c);
+        preg_match_all("/${pattern}/s", $text, $c);
 
         return $c;
     }
@@ -47,16 +47,19 @@ class ShortcodableParser
      */
     public function parse_atts($content)
     {
-        $content = preg_match_all('/([^ ]*)=(\'([^\']*)\'|\"([^\"]*)\"|([^ ]*))/', trim($content), $c);
+        $content = preg_match_all('/([^ =]*)=(\'([^\']*)\'|\"([^\"]*)\"|([^ ]*))/', trim($content), $c);
         list($dummy, $keys, $values) = array_values($c);
-        $c = array();
+        $c = [];
         foreach ($keys as $key => $value) {
             $value = trim($values[$key], "\"'");
             $type = is_numeric($value) ? 'int' : 'string';
-            $type = in_array(strtolower($value), array('true', 'false')) ? 'bool' : $type;
+            $type = in_array(strtolower($value), ['true', 'false'], true) ? 'bool' : $type;
             switch ($type) {
-                case 'int': $value = (int) $value; break;
-                case 'bool': $value = 'true' == strtolower($value); break;
+                case 'int': $value = (int) $value;
+                break;
+
+                case 'bool': $value = 'true' === strtolower($value);
+                break;
             }
             $c[$keys[$key]] = $value;
         }
@@ -77,14 +80,14 @@ class ShortcodableParser
         $t = array_filter($this->get_pattern($text));
         if (!empty($t)) {
             list($d, $d, $parents, $atts, $d, $contents) = $patts;
-            $out2 = array();
+            $out2 = [];
             $n = 0;
             foreach ($parents as $k => $parent) {
                 ++$n;
                 $name = $child ? 'child'.$n : $n;
                 $t = array_filter($this->get_pattern($contents[$k]));
                 $t_s = $this->the_shortcodes($out2, $contents[$k], true);
-                $output[$name] = array('name' => $parents[$k]);
+                $output[$name] = ['name' => $parents[$k]];
                 $output[$name]['atts'] = $this->parse_atts($atts[$k]);
                 $output[$name]['original_content'] = $contents[$k];
                 $output[$name]['content'] = !empty($t) && !empty($t_s) ? $t_s : $contents[$k];
@@ -108,7 +111,7 @@ class ShortcodableParser
         return
             '\\['                              // Opening bracket
             .'(\\[?)'                           // 1: Optional second opening bracket for escaping shortcodes: [[tag]]
-            ."($tagregexp)"                     // 2: Shortcode name
+            ."(${tagregexp})"                     // 2: Shortcode name
             .'(?![\\w-])'                       // Not followed by word character or hyphen
             .'('                                // 3: Unroll the loop: Inside the opening shortcode tag
             .'[^\\]\\/]*'                   // Not a closing bracket or forward slash

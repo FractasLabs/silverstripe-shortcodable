@@ -1,11 +1,10 @@
 <?php
 
-namespace SheaDawson\Shortcodable;
+namespace Silverstripe\Shortcodable;
 
-use SilverStripe\View\Parsers\ShortcodeParser;
-use SheaDawson\Shortcodable\Extensions\ShortcodableParser;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\View\Parsers\ShortcodeParser;
 
 /**
  * Shortcodable
@@ -17,7 +16,7 @@ class Shortcodable
 {
     use Injectable;
 
-    private static $shortcodable_classes = array();
+    private static $shortcodable_classes = [];
 
     public static function register_classes($classes)
     {
@@ -32,9 +31,9 @@ class Shortcodable
     {
         if (class_exists($class)) {
             if (!singleton($class)->hasMethod('parse_shortcode')) {
-                user_error("Failed to register \"$class\" with shortcodable. $class must have the method parse_shortcode(). See /shortcodable/README.md", E_USER_ERROR);
+                user_error("Failed to register \"${class}\" with shortcodable. ${class} must have the method parse_shortcode(). See /shortcodable/README.md", E_USER_ERROR);
             }
-            ShortcodeParser::get('default')->register($class, array(singleton($class), 'parse_shortcode'));
+            ShortcodeParser::get('default')->register($class, [$class, 'parse_shortcode']);
             singleton(ShortcodableParser::class)->register($class);
         }
     }
@@ -47,12 +46,14 @@ class Shortcodable
     public static function get_shortcodable_classes_fordropdown()
     {
         $classList = self::get_shortcodable_classes();
-        $classes = array();
-        foreach ($classList as $class) {
-            if (singleton($class)->hasMethod('singular_name')) {
-                $classes[$class] = singleton($class)->singular_name();
-            } else {
-                $classes[$class] = $class;
+        $classes = [];
+        if (is_array($classList)) {
+            foreach ($classList as $class) {
+                if (singleton($class)->hasMethod('singular_name')) {
+                    $classes[$class] = singleton($class)->singular_name();
+                } else {
+                    $classes[$class] = $class;
+                }
             }
         }
 
@@ -61,7 +62,7 @@ class Shortcodable
 
     public static function get_shortcodable_classes_with_placeholders()
     {
-        $classes = array();
+        $classes = [];
         foreach (self::get_shortcodable_classes() as $class) {
             if (singleton($class)->hasMethod('getShortcodePlaceHolder')) {
                 $classes[] = $class;

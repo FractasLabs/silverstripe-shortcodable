@@ -1,9 +1,9 @@
 <?php
 
-namespace SheaDawson\Shortcodable\Extensions;
+namespace Silverstripe\Shortcodable;
 
-use SheaDawson\Shortcodable\Shortcodable;
 use SilverStripe\Core\Extension;
+use Silverstripe\Shortcodable;
 
 class ShortcodableHtmlEditorField extends Extension
 {

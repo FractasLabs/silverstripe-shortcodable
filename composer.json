@@ -26,6 +26,11 @@
             "javascript"
         ]
     },
+    "autoload": {
+        "psr-4": {
+            "SilverStripe\\Shortcodable\\": "src/"
+        }
+    },
     "support": {
         "issues": "https://github.com/sheadawson/silverstripe-shortcodable/issues"
     },
