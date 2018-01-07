@@ -1,5 +1,5 @@
 {
-    "name": "sheadawson/shortcodable",
+    "name": "silverstripe/shortcodable",
     "type": "silverstripe-vendormodule",
     "description": "Provides a GUI for CMS users to insert Shortcodes into the HTMLEditorField + an API for developers to define Shortcodable DataObjects and Views",
     "keywords": [
