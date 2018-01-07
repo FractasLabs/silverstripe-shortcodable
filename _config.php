@@ -3,7 +3,7 @@
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 use SilverStripe\Forms\HTMLEditor\HtmlEditorConfig;
-use Silverstripe\Shortcodable;
+use Silverstripe\Shortcodable\Shortcodable;
 
 if (!defined('SHORTCODABLE_DIR')) {
     define('SHORTCODABLE_DIR', rtrim(basename(dirname(__FILE__))));
