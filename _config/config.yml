@@ -22,7 +22,7 @@ Silverstripe\Shortcodable\Shortcodable:
 
 SilverStripe\Forms\HTMLEditor\HtmlEditorField:
   extensions:
-    - SilverStripe\Shortcodable\Extensions\ShortcodableHtmlEditorField
+    - Silverstripe\Shortcodable\ShortcodableHtmlEditorField
 
 SilverStripe\View\Parsers\ShortcodeParser:
   extensions:

@@ -3,7 +3,7 @@
 namespace Silverstripe\Shortcodable;
 
 use SilverStripe\Core\Extension;
-use Silverstripe\Shortcodable;
+use Silverstripe\Shortcodable\Shortcodable;
 
 class ShortcodableHtmlEditorField extends Extension
 {
